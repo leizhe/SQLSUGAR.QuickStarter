@@ -1,0 +1,11 @@
+/SS.CORE.API/.vs
+/SS.CORE.API/SS.Application/bin
+/SS.CORE.API/SS.Application/obj
+/SS.CORE.API/SS.Common/obj
+/SS.CORE.API/SS.Common/bin
+/SS.CORE.API/SS.Domain/obj
+/SS.CORE.API/SS.Domain/bin
+/SS.CORE.API/SS.Repositories/bin
+/SS.CORE.API/SS.Repositories/obj
+/SS.CORE.API/SS.WebAPI/bin
+/SS.CORE.API/SS.WebAPI/obj
