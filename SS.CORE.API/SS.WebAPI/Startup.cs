@@ -11,6 +11,7 @@ using SS.Application.ServiceImp;
 using SS.Common.Filters;
 using SS.Common.Helpers;
 using SS.Common.IoC;
+using SS.Domain.Repositories;
 using SS.Repositories.DBContext;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -103,6 +104,7 @@ namespace SS.WebAPI
             IoCContainer.Register(typeof(DBContext));
             IoCContainer.Register(typeof(DbSet<>).Assembly, "Repository");//注册仓储
             IoCContainer.Register(typeof(BaseService).Assembly, "Service");
+            IoCContainer.Register(typeof(DbSet<>), typeof(IRepository<>));
             return IoCContainer.Build(services);
         }
     }

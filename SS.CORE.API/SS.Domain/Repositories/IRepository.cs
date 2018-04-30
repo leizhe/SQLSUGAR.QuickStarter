@@ -14,12 +14,13 @@ namespace SS.Domain.Repositories
         ISugarQueryable<T> Find(Expression<Func<T, bool>> exp = null);
         ISugarQueryable<T> Find(Expression<Func<T, bool>> expression, Expression<Func<T, dynamic>> sortPredicate, SortOrder sortOrder, int pageNumber, int pageSize);
         int Count(Expression<Func<T, bool>> exp = null);
-        void Add(T entity);
+        long Add(T entity);
         void AddRange(IEnumerable<T> entities);
         void Update(T entity);
         void Update(IEnumerable<T> entities);
+        void Update(Expression<Func<T, bool>> filterExpression, T entity);
         void Delete(T entity);
-        void Delete(Expression<Func<T, bool>> exp);
+        void Delete(Expression<Func<T, bool>> filterExpression);
 
 
     }

@@ -14,11 +14,11 @@ namespace SS.Application.ServiceImp
     public class UserService : BaseService, IUserService
     {
         private readonly IUserRepository _userRepository;
-        //private readonly IUserRoleQueryRepository _userRoleQuery;
-        public UserService(IUserRepository userRepository)
+        private readonly IRepository<UserRole> _userRoleRepository;
+        public UserService(IUserRepository userRepository, IRepository<UserRole> userRoleRepository)
         {
             _userRepository = userRepository;
-            // _userRoleQuery = userRoleQueryRepository;
+            _userRoleRepository = userRoleRepository;
         }
         public GetResult<UserDto> GetUser(int userId)
         {
@@ -71,144 +71,136 @@ namespace SS.Application.ServiceImp
             return result;
         }
 
-        //public UpdateResult UpdateUser(UserDto user)
-        //{
-        //    var result = GetDefault<UpdateResult>();
-        //    var existUser = _userQuery.FindSingle(u => u.Id == user.Id);
-        //    if (existUser == null)
-        //    {
-        //        result.Message = "USER_NOT_EXIST";
-        //        result.StateCode = 0x00303;
-        //        return result;
-        //    }
-        //    if (IsHasSameName(existUser.Name, existUser.Id))
-        //    {
-        //        result.Message = "USER_NAME_HAS_EXIST";
-        //        result.StateCode = 0x00302;
-        //        return result;
-        //    }
+        public UpdateResult UpdateUser(UserDto user)
+        {
+            var result = GetDefault<UpdateResult>();
+            var existUser = _userRepository.FindSingle(u => u.Id == user.Id);
+            if (existUser == null)
+            {
+                result.Message = "USER_NOT_EXIST";
+                result.StateCode = 0x00303;
+                return result;
+            }
+            if (IsHasSameName(existUser.Name, existUser.Id))
+            {
+                result.Message = "USER_NAME_HAS_EXIST";
+                result.StateCode = 0x00302;
+                return result;
+            }
 
-        //    _userCommand.Update(p => p.Id == user.Id, u => new Models.Command.User()
-        //    {
-        //        RealName = user.RealName,
-        //        Name = user.Name,
-        //        State = user.State,
-        //        Email = user.Email
-        //    });
+            _userRepository.Update(p => p.Id == user.Id,new User()
+            {
+                RealName = user.RealName,
+                Name = user.Name,
+                State = user.State,
+                Email = user.Email
+            });
 
-        //    result.IsSaved = true;
-        //    return result;
-        //}
+            result.IsSaved = true;
+            return result;
+        }
 
-        //public CreateResult<long> AddUser(UserDto userDto)
-        //{
-        //    var result = GetDefault<CreateResult<long>>();
-        //    if (IsHasSameName(userDto.Name, userDto.Id))
-        //    {
-        //        result.Message = "USER_NAME_HAS_EXIST";
-        //        result.StateCode = 0x00302;
-        //        return result;
-        //    }
-        //    var user = new Models.Command.User()
-        //    {
-        //        CreationTime = DateTime.Now,
-        //        Password = "",
-        //        Email = userDto.Email,
-        //        State = userDto.State,
-        //        RealName = userDto.RealName,
-        //        Name = userDto.Name
-        //    };
+        public CreateResult<long> AddUser(UserDto userDto)
+        {
+            var result = GetDefault<CreateResult<long>>();
+            if (IsHasSameName(userDto.Name, userDto.Id))
+            {
+                result.Message = "USER_NAME_HAS_EXIST";
+                result.StateCode = 0x00302;
+                return result;
+            }
+            var user = new User()
+            {
+                CreationTime = DateTime.UtcNow,
+                Password = "",
+                Email = userDto.Email,
+                State = userDto.State,
+                RealName = userDto.RealName,
+                Name = userDto.Name
+            };
+            
+            result.Id = _userRepository.Add(user);
+            result.IsCreated = true;
+            return result;
+        }
 
-        //    _userCommand.Add(user);
-        //    _userCommand.Commit();
-        //    result.Id = user.Id;
-        //    result.IsCreated = true;
-        //    return result;
-        //}
+        public DeleteResult DeleteUser(int userId)
+        {
+            var result = GetDefault<DeleteResult>();
+            _userRepository.Delete(x => x.Id == userId);
+            result.IsDeleted = true;
+            return result;
+        }
 
-        //public DeleteResult DeleteUser(int userId)
-        //{
-        //    var result = GetDefault<DeleteResult>();
-        //    //var user = _userQuery.FindSingle(x => x.Id == userId);
-        //    //if (user != null)
-        //    //{
-        //    //    _userCommand.Delete(user);
-        //    //    _userCommand.Commit();
-        //    //}
-        //    _userCommand.Delete(x => x.Id == userId);
-        //    result.IsDeleted = true;
-        //    return result;
-        //}
+        public UpdateResult UpdatePwd(UserDto user)
+        {
+            var result = GetDefault<UpdateResult>();
+            var userEntity = _userRepository.FindSingle(x => x.Id == user.Id);
+            if (userEntity == null)
+            {
+                result.Message = string.Format("当前编辑的用户“{0}”已经不存在", user.Name);
+                return result;
+            }
 
-        //public UpdateResult UpdatePwd(UserDto user)
-        //{
-        //    var result = GetDefault<UpdateResult>();
-        //    var userEntity = _userQuery.FindSingle(x => x.Id == user.Id);
-        //    if (userEntity == null)
-        //    {
-        //        result.Message = string.Format("当前编辑的用户“{0}”已经不存在", user.Name);
-        //        return result;
-        //    }
+            _userRepository.Update(p => p.Id == user.Id, new User()
+            {
+                Password = user.Password
+            });
+            result.IsSaved = true;
+            return result;
+        }
 
-        //    _userCommand.Update(p => p.Id == user.Id, u => new Models.Command.User()
-        //    {
-        //        Password = user.Password
-        //    });
-        //    result.IsSaved = true;
-        //    return result;
-        //}
+        public UpdateResult UpdateRoles(UserDto user)
+        {
+            var result = GetDefault<UpdateResult>();
+            var model = _userRepository.FindSingle(x => x.Id == user.Id);
+            if (model == null)
+            {
+                result.Message = "USE_NOT_EXIST";
+                result.StateCode = 0x00402;
+                return result;
+            }
 
-        //public UpdateResult UpdateRoles(UserDto user)
-        //{
-        //    var result = GetDefault<UpdateResult>();
-        //    var model = _userRepository.FindSingle(x => x.Id == user.Id);
-        //    if (model == null)
-        //    {
-        //        result.Message = "USE_NOT_EXIST";
-        //        result.StateCode = 0x00402;
-        //        return result;
-        //    }
+            var list = model.UserRoles.ToList();
+            if (user.Roles != null)
+            {
+                foreach (var item in user.Roles)
+                {
+                    if (!list.Exists(x => x.Role.Id == item.Id))
+                    {
+                        _userRoleRepository.Add(new UserRole { RoleId = item.Id, UserId = model.Id });
+                    }
+                }
 
-        //    var list = model.UserRoles.ToList();
-        //    if (user.Roles != null)
-        //    {
-        //        foreach (var item in user.Roles)
-        //        {
-        //            if (!list.Exists(x => x.Role.Id == item.Id))
-        //            {
-        //                _userRoleRepository.Add(new UserRole { RoleId = item.Id, UserId = model.Id });
-        //            }
-        //        }
+                foreach (var item in list)
+                {
+                    if (!user.Roles.Exists(x => x.Id == item.Id))
+                    {
+                        _userRoleRepository.Delete(item);
+                    }
+                }
 
-        //        foreach (var item in list)
-        //        {
-        //            if (!user.Roles.Exists(x => x.Id == item.Id))
-        //            {
-        //                _userRoleRepository.Delete(item);
-        //            }
-        //        }
+                //_userRoleRepository.Commit();
+                //_userRepository.Commit();
+            }
 
-        //        _userRoleRepository.Commit();
-        //        _userRepository.Commit();
-        //    }
+            result.IsSaved = true;
+            return result;
+        }
 
-        //    result.IsSaved = true;
-        //    return result;
-        //}
+        public DeleteResult DeleteRole(int userId, int roleId)
+        {
+            var result = GetDefault<DeleteResult>();
+            var model = _userRoleRepository.FindSingle(x => x.UserId == userId && x.RoleId == roleId);
+            if (model != null)
+            {
+                _userRoleRepository.Delete(model);
+               // _userRoleRepository.Commit();
+            }
 
-        //public DeleteResult DeleteRole(int userId, int roleId)
-        //{
-        //    var result = GetDefault<DeleteResult>();
-        //    var model = _userRoleRepository.FindSingle(x => x.UserId == userId && x.RoleId == roleId);
-        //    if (model != null)
-        //    {
-        //        _userRoleRepository.Delete(model);
-        //        _userRoleRepository.Commit();
-        //    }
-
-        //    result.IsDeleted = true;
-        //    return result;
-        //}
+            result.IsDeleted = true;
+            return result;
+        }
 
         public bool Exist(string username, string password)
         {
@@ -217,7 +209,7 @@ namespace SS.Application.ServiceImp
 
         private bool IsHasSameName(string name, long userId)
         {
-            return !string.IsNullOrWhiteSpace(name) && _userRepository.Find(u => u.Name == name).Any();
+            return !string.IsNullOrWhiteSpace(name) && _userRepository.Find(u => u.Name == name && u.Id != userId).Any();
         }
 
         private Expression<Func<User, bool>> BuildExpression(PageInput pageInput)

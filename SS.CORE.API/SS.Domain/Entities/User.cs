@@ -18,7 +18,8 @@ namespace SS.Domain.Entities
         public string RealName { get; set; }
         [SugarColumn(IsNullable = true)]
         public long? CreatorUserId { get; set; }
-        [SugarColumn(IsNullable = true)]
+
+        [SugarColumn(IsNullable = false)]
         public DateTime CreationTime { get; set; }
         [SugarColumn(IsNullable = true)]
         public int State { get; set; }

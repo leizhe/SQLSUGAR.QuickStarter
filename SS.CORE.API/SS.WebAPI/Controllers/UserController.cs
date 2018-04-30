@@ -37,39 +37,39 @@ namespace SS.WebAPI.Controllers
             return _userService.GetUser(id);
         }
 
-        //[HttpPost]
-        //[Route("api/user/AddUser")]
-        //public OutputBase CreateUser([FromBody] UserDto userDto)
-        //{
-        //    return _userService.AddUser(userDto);
-        //}
+        [HttpPost]
+        [Route("api/user/AddUser")]
+        public OutputBase CreateUser([FromBody] UserDto userDto)
+        {
+            return _userService.AddUser(userDto);
+        }
 
-        //[HttpPost]
-        //[Route("api/user/UpdateUser")]
-        //public OutputBase UpdateUser([FromBody] UserDto userDto)
-        //{
-        //    return _userService.UpdateUser(userDto);
-        //}
+        [HttpPut]
+        [Route("api/user/UpdateUser")]
+        public OutputBase UpdateUser([FromBody] UserDto userDto)
+        {
+            return _userService.UpdateUser(userDto);
+        }
 
-        //[HttpPost]
-        //[Route("api/user/UpdateRoles")]
-        //public OutputBase UpdateRoles([FromBody] UserDto userDto)
-        //{
-        //    return _userService.UpdateRoles(userDto);
-        //}
+        [HttpPut]
+        [Route("api/user/UpdateRoles")]
+        public OutputBase UpdateRoles([FromBody] UserDto userDto)
+        {
+            return _userService.UpdateRoles(userDto);
+        }
 
-        //[HttpPost]
-        //[Route("api/user/DeleteUser/{id}")]
-        //public OutputBase DeleteUser(int id)
-        //{
-        //    return _userService.DeleteUser(id);
-        //}
+        [HttpDelete]
+        [Route("api/user/DeleteUser/{id}")]
+        public OutputBase DeleteUser(int id)
+        {
+            return _userService.DeleteUser(id);
+        }
 
-        //[HttpPost]
-        //[Route("api/user/DeleteRole/{id}/{roleId}")]
-        //public OutputBase DeleteRole(int id, int roleId)
-        //{
-        //    return _userService.DeleteRole(id, roleId);
-        //}
+        [HttpDelete]
+        [Route("api/user/DeleteRole/{id}/{roleId}")]
+        public OutputBase DeleteRole(int id, int roleId)
+        {
+            return _userService.DeleteRole(id, roleId);
+        }
     }
 }

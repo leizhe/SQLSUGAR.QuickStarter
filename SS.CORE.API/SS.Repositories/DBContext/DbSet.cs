@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using SqlSugar;
 using SS.Domain.Repositories;
 
@@ -29,10 +28,10 @@ namespace SS.Repositories.DBContext
             SortOrder sortOrder, int pageNumber, int pageSize)
         {
             if (pageNumber <= 0)
-                throw new ArgumentOutOfRangeException("pageNumber", pageNumber,
+                throw new ArgumentOutOfRangeException(nameof(pageNumber), pageNumber,
                     "pageNumber must great than or equal to 1.");
             if (pageSize <= 0)
-                throw new ArgumentOutOfRangeException("pageSize", pageSize, "pageSize must great than or equal to 1.");
+                throw new ArgumentOutOfRangeException(nameof(pageSize), pageSize, "pageSize must great than or equal to 1.");
 
             var query = Context.Queryable<T>().Where(expression);
             var skip = (pageNumber - 1) * pageSize;
@@ -61,9 +60,9 @@ namespace SS.Repositories.DBContext
             return Filter(exp).Count();
         }
 
-        public void Add(T entity)
+        public long Add(T entity)
         {
-            Context.Insertable(entity).ExecuteReturnBigIdentity();
+            return Context.Insertable(entity).ExecuteReturnBigIdentity();
         }
 
         public void AddRange(IEnumerable<T> entities)
@@ -73,12 +72,16 @@ namespace SS.Repositories.DBContext
 
         public new void Update(T entity)
         {
-            Context.Updateable(entity).ExecuteCommand();
+            Context.Updateable(entity).Where(true).ExecuteCommand();
         }
 
         public void Update(IEnumerable<T> entities)
         {
-            Context.Updateable(entities.ToArray()).ExecuteCommand();
+            Context.Updateable(entities.ToArray()).Where(true).ExecuteCommand();
+        }
+        public void Update(Expression<Func<T, bool>> filterExpression, T entity)
+        {
+            Context.Updateable(entity).Where(true).Where(filterExpression).ExecuteCommand();
         }
 
         public new void Delete(T entity)
@@ -98,5 +101,9 @@ namespace SS.Repositories.DBContext
                 dbSet = dbSet.Where(exp);
             return dbSet;
         }
+        
+
+       
+        
     }
 }
