@@ -7,20 +7,20 @@ namespace SS.Domain.Entities
 {
     public class User : BaseEntity, ICreationAudited
     {
-        [SugarColumn(Length = 20, IsNullable = false)]
+        [SugarColumn(Length = 20)]
         public string Name { get; set; }
 
-        [SugarColumn(Length = 50)]
+        [SugarColumn(Length = 50, IsNullable = true)]
         public string Password { get; set; }
-        [SugarColumn(Length = 20)]
+        [SugarColumn(Length = 20, IsNullable = true)]
         public string Email { get; set; }
-        [SugarColumn(Length = 20)]
+        [SugarColumn(Length = 20, IsNullable = true)]
         public string RealName { get; set; }
-
+        [SugarColumn(IsNullable = true)]
         public long? CreatorUserId { get; set; }
-
+        [SugarColumn(IsNullable = true)]
         public DateTime CreationTime { get; set; }
-
+        [SugarColumn(IsNullable = true)]
         public int State { get; set; }
 
         [SugarColumn(IsIgnore = true)]

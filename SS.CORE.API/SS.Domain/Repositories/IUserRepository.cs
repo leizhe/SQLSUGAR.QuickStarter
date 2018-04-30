@@ -1,9 +1,8 @@
-﻿//using SS.Domain.Models;
-//using SS.Domain.Repositories;
+﻿using SS.Domain.Entities;
 
-//namespace Example.Domain.Repositories
-//{
-//    public interface IUserRepository : IRepository<User>
-//    {
-//    }
-//}
+namespace SS.Domain.Repositories
+{
+    public interface IUserRepository :IRepository<User>
+    {
+    }
+}

@@ -1,20 +1,16 @@
-﻿using SqlSugar;
+﻿using System;
+using System.Collections.Generic;
+using SqlSugar;
 using SS.Domain.Entities;
 
 namespace SS.Repositories.DBContext
 {
-    public class DBContext 
+    public class DBContext : IDisposable
     {
-
-        public DBContext()
+      
+        public DBContext(SqlSugarClient db)
         {
-            Db =new SqlSugarClient(new ConnectionConfig()
-                {
-                    ConnectionString = "xx",
-                    DbType = DbType.SqlServer,
-                    IsAutoCloseConnection = true
-                }
-            );
+            Db = db;
         }
 
         public SqlSugarClient Db;
@@ -25,6 +21,9 @@ namespace SS.Repositories.DBContext
         public DbSet<UserRole> UserRoles { get; set; }
 
 
-     
+        public void Dispose()
+        {
+            Db.Dispose();
+        }
     }
 }

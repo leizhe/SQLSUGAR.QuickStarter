@@ -9,11 +9,12 @@ using SS.Domain.Repositories;
 
 namespace SS.Repositories.DBContext
 {
-    public class DbSet<T>: SimpleClient<T>, IRepository<T> where T:class ,new ()
+    public class DbSet<T> : SimpleClient<T>, IRepository<T> where T : class, new()
     {
         public DbSet(SqlSugarClient context) : base(context)
         {
         }
+
         public T FindSingle(Expression<Func<T, bool>> exp = null)
         {
             return Context.Queryable<T>().First(exp);
@@ -24,31 +25,35 @@ namespace SS.Repositories.DBContext
             return Filter(exp);
         }
 
-        public ISugarQueryable<TEntity> Find(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, dynamic>> sortPredicate, SortOrder sortOrder, int pageNumber, int pageSize)
+        public ISugarQueryable<T> Find(Expression<Func<T, bool>> expression, Expression<Func<T, dynamic>> sortPredicate,
+            SortOrder sortOrder, int pageNumber, int pageSize)
         {
             if (pageNumber <= 0)
-                throw new ArgumentOutOfRangeException("pageNumber", pageNumber, "pageNumber must great than or equal to 1.");
+                throw new ArgumentOutOfRangeException("pageNumber", pageNumber,
+                    "pageNumber must great than or equal to 1.");
             if (pageSize <= 0)
                 throw new ArgumentOutOfRangeException("pageSize", pageSize, "pageSize must great than or equal to 1.");
 
-            var query = DbContext.Set<TEntity>().Where(expression);
+            var query = Context.Queryable<T>().Where(expression);
             var skip = (pageNumber - 1) * pageSize;
             var take = pageSize;
             if (sortPredicate == null)
-                throw new InvalidOperationException("Based on the paging query must specify sorting fields and sort order.");
+                throw new InvalidOperationException(
+                    "Based on the paging query must specify sorting fields and sort order.");
 
             switch (sortOrder)
             {
                 case SortOrder.Ascending:
-                    var pagedAscending = query.SortBy(sortPredicate).Skip(skip).Take(take);
+                    var pagedAscending = query.OrderBy(sortPredicate).Skip(skip).Take(take);
 
                     return pagedAscending;
                 case SortOrder.Descending:
-                    var pagedDescending = query.SortByDescending(sortPredicate).Skip(skip).Take(take);
+                    var pagedDescending = query.OrderBy(sortPredicate, OrderByType.Desc).Skip(skip).Take(take);
                     return pagedDescending;
             }
 
-            throw new InvalidOperationException("Based on the paging query must specify sorting fields and sort order.");
+            throw new InvalidOperationException(
+                "Based on the paging query must specify sorting fields and sort order.");
         }
 
         public int Count(Expression<Func<T, bool>> exp = null)
@@ -73,22 +78,17 @@ namespace SS.Repositories.DBContext
 
         public void Update(IEnumerable<T> entities)
         {
-
-        };
-
-        public void Delete(TEntity entity)
-        {
-            DbContext.Entry(entity).State = EntityState.Deleted;
-            DbContext.Set<TEntity>().Remove(entity);
+            Context.Updateable(entities.ToArray()).ExecuteCommand();
         }
 
-        public void Delete(ICollection<T> entityCollection)
+        public new void Delete(T entity)
         {
-            if (entityCollection.Count == 0)
-                return;
+            Context.Deleteable(entity).ExecuteCommand();
+        }
 
-            DbContext.Set<TEntity>().Attach(entityCollection.First());
-            DbContext.Set<TEntity>().RemoveRange(entityCollection);
+        public new void Delete(Expression<Func<T, bool>> exp)
+        {
+            Context.Deleteable(exp).ExecuteCommand();
         }
 
         private ISugarQueryable<T> Filter(Expression<Func<T, bool>> exp)
@@ -98,8 +98,5 @@ namespace SS.Repositories.DBContext
                 dbSet = dbSet.Where(exp);
             return dbSet;
         }
-
-    
-
     }
 }
