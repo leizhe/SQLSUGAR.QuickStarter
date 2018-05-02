@@ -10,6 +10,7 @@ namespace SS.Domain.Repositories
 {
     public interface IRepository<T> where T : class
     {
+        SqlSugarClient DB { get; }
         T FindSingle(Expression<Func<T, bool>> exp = null);
         ISugarQueryable<T> Find(Expression<Func<T, bool>> exp = null);
         ISugarQueryable<T> Find(Expression<Func<T, bool>> expression, Expression<Func<T, dynamic>> sortPredicate, SortOrder sortOrder, int pageNumber, int pageSize);

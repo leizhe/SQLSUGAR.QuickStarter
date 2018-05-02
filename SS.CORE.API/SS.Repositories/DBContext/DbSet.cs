@@ -10,10 +10,12 @@ namespace SS.Repositories.DBContext
 {
     public class DbSet<T> : SimpleClient<T>, IRepository<T> where T : class, new()
     {
+        public SqlSugarClient DB { get; }
         public DbSet(SqlSugarClient context) : base(context)
         {
+            DB = context;
         }
-
+        
         public T FindSingle(Expression<Func<T, bool>> exp = null)
         {
             return Context.Queryable<T>().First(exp);

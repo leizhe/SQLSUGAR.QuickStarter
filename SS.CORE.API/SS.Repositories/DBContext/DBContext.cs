@@ -7,7 +7,7 @@ namespace SS.Repositories.DBContext
 {
     public class DBContext : IDisposable
     {
-      
+
         public DBContext(SqlSugarClient db)
         {
             Db = db;
@@ -17,7 +17,7 @@ namespace SS.Repositories.DBContext
         public DbSet<User> Users { get; set; }
 
         public DbSet<Role> Roles { get; set; }
-        
+
         public DbSet<UserRole> UserRoles { get; set; }
 
 
