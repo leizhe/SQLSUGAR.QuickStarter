@@ -11,17 +11,17 @@ namespace SS.Application.ServiceContract
 
         UpdateResult UpdateUser(UserDto user);
 
-        CreateResult<long> AddUser(UserDto user);
+        //CreateResult<long> AddUser(UserDto user);
 
-        DeleteResult DeleteUser(int userId);
+        //DeleteResult DeleteUser(int userId);
 
-        UpdateResult UpdatePwd(UserDto user);
+        //UpdateResult UpdatePwd(UserDto user);
 
 
 
-        UpdateResult UpdateRoles(UserDto user);
+        //UpdateResult UpdateRoles(UserDto user);
 
-        DeleteResult DeleteRole(int userId, int roleId);
+        //DeleteResult DeleteRole(int userId, int roleId);
 
         bool Exist(string username, string password);
     }

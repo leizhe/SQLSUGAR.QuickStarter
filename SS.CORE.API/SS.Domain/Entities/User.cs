@@ -5,7 +5,8 @@ using SS.Domain.Auditing;
 
 namespace SS.Domain.Entities
 {
-    public class User : BaseEntity, ICreationAudited
+    [SugarTable("User")]
+    public class User : BaseModelContextEntity, ICreationAudited
     {
         [SugarColumn(Length = 20)]
         public string Name { get; set; }
@@ -25,11 +26,9 @@ namespace SS.Domain.Entities
         public int State { get; set; }
 
         [SugarColumn(IsIgnore = true)]
-        public ICollection<UserRole> UserRoles { get; set; }
-
-        public User()
-        {
-            UserRoles = new List<UserRole>();
+        public ICollection<UserRole> UserRoles {
+            get { return base.CreateMapping<UserRole>().Where(p => p.UserId == this.Id).ToList(); }
         }
+        
     }
 }

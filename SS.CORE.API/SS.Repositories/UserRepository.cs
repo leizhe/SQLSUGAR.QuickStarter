@@ -7,9 +7,9 @@ namespace SS.Repositories
 {
     public class UserRepository: BaseRepository<User>, IUserRepository
     {
-        public UserRepository(DBService server) : base(server)
-        {
-        }
+        //public UserRepository(DBService server) : base(server)
+        //{
+        //}
 
         public ISugarQueryable<User> GetAll()
         {
@@ -26,6 +26,11 @@ namespace SS.Repositories
             //        Name = user.Name,
             //        UserRoles = userRole
             //    });
+        }
+
+
+        public UserRepository(SqlSugarClient context) : base(context)
+        {
         }
     }
 }

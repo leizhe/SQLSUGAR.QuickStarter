@@ -89,7 +89,7 @@ namespace SS.WebAPI
             {
                 ConnectionString = commandString,
                 DbType = DbType.SqlServer,
-                IsAutoCloseConnection = true,
+                IsAutoCloseConnection = false,
                 InitKeyType = InitKeyType.Attribute,  // Attribute用于DbFirst  从数据库生成model的
                 //InitKeyType = InitKeyType.SystemTable, //SystemTable用于Codefirst 从model库生成数据库表的
                 SlaveConnectionConfigs = new List<SlaveConnectionConfig>()
@@ -97,9 +97,14 @@ namespace SS.WebAPI
                     new SlaveConnectionConfig() {HitRate = 10, ConnectionString = queryString}
                 }
             };
+
+            SqlSugarClient sqlSugarClient=new SqlSugarClient(connectionConfig);
+
+
+
             IoCContainer.Register(Configuration);//注册配置
-            IoCContainer.Register(connectionConfig);//注册数据库配置信息
-            IoCContainer.Register(typeof(DBService));
+            IoCContainer.Register(sqlSugarClient);//注册数据库配置信息
+           // IoCContainer.Register(typeof(DBService));
             IoCContainer.Register(typeof(BaseRepository<>).Assembly, "Repository");//注册仓储
             IoCContainer.Register(typeof(BaseService).Assembly, "Service");
             IoCContainer.Register(typeof(BaseRepository<>), typeof(IRepository<>));

@@ -15,7 +15,9 @@ namespace SS.Application.ServiceImp
     {
         private readonly IUserRepository _userRepository;
         private readonly IRepository<UserRole> _userRoleRepository;
-        public UserService(IUserRepository userRepository, IRepository<UserRole> userRoleRepository)
+        public UserService(IUserRepository userRepository
+            , IRepository<UserRole> userRoleRepository
+            )
         {
             _userRepository = userRepository;
             _userRoleRepository = userRoleRepository;
@@ -50,7 +52,30 @@ namespace SS.Application.ServiceImp
             var filterExp = BuildExpression(input);
             var query = _userRepository.Find(filterExp, user => user.Id, SortOrder.Descending, input.Current, input.Size);
            // var dsad = _userRepository.GetAll().ToList();
-            //var dsads = query.ToList();
+            var dsads = query.ToList();
+            for (int i = 0; i < 10000; i++)
+            {
+                result.Total = _userRepository.Find(filterExp).Count();
+                result.Data = query.Select(user => new UserDto()
+                {
+                    Id = user.Id,
+                    CreateTime = user.CreationTime,
+                    Email = user.Email,
+                    State = user.State,
+                    Name = user.Name,
+                    RealName = user.RealName,
+                    Password = "*******",
+                    //Roles = user.UserRoles.Select(z => new BaseEntityDto()
+                    //{
+                    //    Id = z.Role.Id,
+                    //    Name = z.Role.RoleName
+                    //}).ToList(),
+
+                    //TotalRole = user.UserRoles.Count()
+                }).ToList();
+
+            }
+
             result.Total = _userRepository.Find(filterExp).Count();
             result.Data = query.Select(user => new UserDto()
             {
@@ -102,107 +127,107 @@ namespace SS.Application.ServiceImp
             return result;
         }
 
-        public CreateResult<long> AddUser(UserDto userDto)
-        {
-            var result = GetDefault<CreateResult<long>>();
-            if (IsHasSameName(userDto.Name, userDto.Id))
-            {
-                result.Message = "USER_NAME_HAS_EXIST";
-                result.StateCode = 0x00302;
-                return result;
-            }
-            var user = new User()
-            {
-                CreationTime = DateTime.UtcNow,
-                Password = "",
-                Email = userDto.Email,
-                State = userDto.State,
-                RealName = userDto.RealName,
-                Name = userDto.Name
-            };
+        //public CreateResult<long> AddUser(UserDto userDto)
+        //{
+        //    var result = GetDefault<CreateResult<long>>();
+        //    if (IsHasSameName(userDto.Name, userDto.Id))
+        //    {
+        //        result.Message = "USER_NAME_HAS_EXIST";
+        //        result.StateCode = 0x00302;
+        //        return result;
+        //    }
+        //    var user = new User()
+        //    {
+        //        CreationTime = DateTime.UtcNow,
+        //        Password = "",
+        //        Email = userDto.Email,
+        //        State = userDto.State,
+        //        RealName = userDto.RealName,
+        //        Name = userDto.Name
+        //    };
             
-            result.Id = _userRepository.Add(user);
-            result.IsCreated = true;
-            return result;
-        }
+        //    result.Id = _userRepository.Add(user);
+        //    result.IsCreated = true;
+        //    return result;
+        //}
 
-        public DeleteResult DeleteUser(int userId)
-        {
-            var result = GetDefault<DeleteResult>();
-            _userRepository.Delete(x => x.Id == userId);
-            result.IsDeleted = true;
-            return result;
-        }
+        //public DeleteResult DeleteUser(int userId)
+        //{
+        //    var result = GetDefault<DeleteResult>();
+        //    _userRepository.Delete(x => x.Id == userId);
+        //    result.IsDeleted = true;
+        //    return result;
+        //}
 
-        public UpdateResult UpdatePwd(UserDto user)
-        {
-            var result = GetDefault<UpdateResult>();
-            var userEntity = _userRepository.FindSingle(x => x.Id == user.Id);
-            if (userEntity == null)
-            {
-                result.Message = string.Format("当前编辑的用户“{0}”已经不存在", user.Name);
-                return result;
-            }
+        //public UpdateResult UpdatePwd(UserDto user)
+        //{
+        //    var result = GetDefault<UpdateResult>();
+        //    var userEntity = _userRepository.FindSingle(x => x.Id == user.Id);
+        //    if (userEntity == null)
+        //    {
+        //        result.Message = string.Format("当前编辑的用户“{0}”已经不存在", user.Name);
+        //        return result;
+        //    }
 
-            _userRepository.Update(p => p.Id == user.Id, new User()
-            {
-                Password = user.Password
-            });
-            result.IsSaved = true;
-            return result;
-        }
+        //    _userRepository.Update(p => p.Id == user.Id, new User()
+        //    {
+        //        Password = user.Password
+        //    });
+        //    result.IsSaved = true;
+        //    return result;
+        //}
 
-        public UpdateResult UpdateRoles(UserDto user)
-        {
-            var result = GetDefault<UpdateResult>();
-            var model = _userRepository.FindSingle(x => x.Id == user.Id);
-            if (model == null)
-            {
-                result.Message = "USE_NOT_EXIST";
-                result.StateCode = 0x00402;
-                return result;
-            }
+        //public UpdateResult UpdateRoles(UserDto user)
+        //{
+        //    var result = GetDefault<UpdateResult>();
+        //    var model = _userRepository.FindSingle(x => x.Id == user.Id);
+        //    if (model == null)
+        //    {
+        //        result.Message = "USE_NOT_EXIST";
+        //        result.StateCode = 0x00402;
+        //        return result;
+        //    }
 
-            var list = model.UserRoles.ToList();
-            if (user.Roles != null)
-            {
-                foreach (var item in user.Roles)
-                {
-                    if (!list.Exists(x => x.Role.Id == item.Id))
-                    {
-                        _userRoleRepository.Add(new UserRole { RoleId = item.Id, UserId = model.Id });
-                    }
-                }
+        //    var list = model.UserRoles.ToList();
+        //    if (user.Roles != null)
+        //    {
+        //        foreach (var item in user.Roles)
+        //        {
+        //            if (!list.Exists(x => x.Role.Id == item.Id))
+        //            {
+        //                _userRoleRepository.Add(new UserRole { RoleId = item.Id, UserId = model.Id });
+        //            }
+        //        }
 
-                foreach (var item in list)
-                {
-                    if (!user.Roles.Exists(x => x.Id == item.Id))
-                    {
-                        _userRoleRepository.Delete(item);
-                    }
-                }
+        //        foreach (var item in list)
+        //        {
+        //            if (!user.Roles.Exists(x => x.Id == item.Id))
+        //            {
+        //                _userRoleRepository.Delete(item);
+        //            }
+        //        }
 
-                //_userRoleRepository.Commit();
-                //_userRepository.Commit();
-            }
+        //        //_userRoleRepository.Commit();
+        //        //_userRepository.Commit();
+        //    }
 
-            result.IsSaved = true;
-            return result;
-        }
+        //    result.IsSaved = true;
+        //    return result;
+        //}
 
-        public DeleteResult DeleteRole(int userId, int roleId)
-        {
-            var result = GetDefault<DeleteResult>();
-            var model = _userRoleRepository.FindSingle(x => x.UserId == userId && x.RoleId == roleId);
-            if (model != null)
-            {
-                _userRoleRepository.Delete(model);
-               // _userRoleRepository.Commit();
-            }
+        //public DeleteResult DeleteRole(int userId, int roleId)
+        //{
+        //    var result = GetDefault<DeleteResult>();
+        //    var model = _userRoleRepository.FindSingle(x => x.UserId == userId && x.RoleId == roleId);
+        //    if (model != null)
+        //    {
+        //        _userRoleRepository.Delete(model);
+        //       // _userRoleRepository.Commit();
+        //    }
 
-            result.IsDeleted = true;
-            return result;
-        }
+        //    result.IsDeleted = true;
+        //    return result;
+        //}
 
         public bool Exist(string username, string password)
         {

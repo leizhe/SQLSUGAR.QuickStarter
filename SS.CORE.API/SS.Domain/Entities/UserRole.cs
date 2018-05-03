@@ -2,15 +2,25 @@
 
 namespace SS.Domain.Entities
 {
-    public class UserRole : BaseEntity
+    [SugarTable("UserRole")]
+    public class UserRole : BaseModelContextEntity
     {
         [SugarColumn(IsNullable = false)]
         public long RoleId { get; set; }
+
         [SugarColumn(IsNullable = false)]
         public long UserId { get; set; }
+
         [SugarColumn(IsIgnore = true)]
-        public virtual User User { get; set; }
+        public User User
+        {
+            get { return CreateMapping<User>().Single(p => p.Id == this.UserId); }
+        }
+
         [SugarColumn(IsIgnore = true)]
-        public virtual Role Role { get; set; }
+        public Role Role
+        {
+            get { return CreateMapping<Role>().Single(p => p.Id == this.RoleId); }
+        }
     }
 }

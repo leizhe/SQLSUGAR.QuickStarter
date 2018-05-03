@@ -5,7 +5,8 @@ using SS.Domain.Auditing;
 
 namespace SS.Domain.Entities
 {
-    public sealed class Role : BaseEntity, ICreationAudited
+    [SugarTable("Role")]
+    public class Role : BaseModelContextEntity, ICreationAudited
     {
         [SugarColumn(Length = 20,IsNullable = false)]
         public string RoleName { get; set; }
@@ -14,14 +15,17 @@ namespace SS.Domain.Entities
         [SugarColumn(IsNullable = true)]
         public DateTime CreationTime { get; set; }
         [SugarColumn(IsIgnore = true)]
-        public ICollection<RolePermission> RolePermissions { get; set; }
+        public List<RolePermission> RolePermissions { get; set; }
         [SugarColumn(IsIgnore = true)]
-        public ICollection<UserRole> UserRoles { get; set; }
-
-        public Role()
+        public ICollection<UserRole> UserRoles
         {
-            RolePermissions = new HashSet<RolePermission>();
-            UserRoles = new HashSet<UserRole>();
+            get { return base.CreateMapping<UserRole>().Where(p => p.UserId == this.Id).ToList(); }
         }
+
+        //public Role()
+        //{
+        //    RolePermissions = new List<RolePermission>();
+        //    UserRoles = new HashSet<UserRole>();
+        //}
     }
 }

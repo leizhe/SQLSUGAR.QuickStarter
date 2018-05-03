@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using SqlSugar;
 using SS.Domain.Entities;
-using SS.Repositories.DBContext;
 
 namespace SS.DataBaseHelp
 {

@@ -1,21 +1,25 @@
-﻿using System;
-using SqlSugar;
+﻿//using System;
+//using SqlSugar;
 
-namespace SS.Repositories.SqlSugar
-{
-    public class DBService : IDisposable
-    {
-        public SqlSugarClient DB;
+//namespace SS.Repositories.SqlSugar
+//{
+//    public class DBService : IDisposable
+//    {
+//        public SqlSugarClient DB;
 
-        public DBService(ConnectionConfig config)
-        {
-            DB =  new SqlSugarClient(config); ;
-        }
+//        public DBService(ConnectionConfig config)
+//        {
+//            DB =  new SqlSugarClient(config) ;
+//        }
         
 
-        public void Dispose()
-        {
-            DB?.Dispose();
-        }
-    }
-}
+//        public void Dispose()
+//        {
+//            if (DB!=null)
+//            {
+//                DB.Dispose();
+//            }
+           
+//        }
+//    }
+//}
