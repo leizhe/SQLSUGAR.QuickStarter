@@ -24,11 +24,11 @@ namespace SS.DataBaseHelp
                     new SlaveConnectionConfig() {HitRate = 10, ConnectionString = queryString}
                 }
             };
-            var sqlSugarClient = new SqlSugarClient(connectionConfig);
+           
 
-            using (var context = new DBContext(sqlSugarClient))
+            using (var db = new SqlSugarClient(connectionConfig))
             {
-                var initialize = new DbInitializer(context.Db);
+                var initialize = new DbInitializer(db);
                 try
                 {
                     initialize.TableInit();

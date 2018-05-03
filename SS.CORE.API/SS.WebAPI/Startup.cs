@@ -12,7 +12,7 @@ using SS.Common.Filters;
 using SS.Common.Helpers;
 using SS.Common.IoC;
 using SS.Domain.Repositories;
-using SS.Repositories.DBContext;
+using SS.Repositories.SqlSugar;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace SS.WebAPI
@@ -90,21 +90,19 @@ namespace SS.WebAPI
                 ConnectionString = commandString,
                 DbType = DbType.SqlServer,
                 IsAutoCloseConnection = true,
-                //InitKeyType = InitKeyType.Attribute  // Attribute用于DbFirst  从数据库生成model的
-                InitKeyType = InitKeyType.SystemTable, //SystemTable用于Codefirst 从model库生成数据库表的
+                InitKeyType = InitKeyType.Attribute,  // Attribute用于DbFirst  从数据库生成model的
+                //InitKeyType = InitKeyType.SystemTable, //SystemTable用于Codefirst 从model库生成数据库表的
                 SlaveConnectionConfigs = new List<SlaveConnectionConfig>()
                 {
                     new SlaveConnectionConfig() {HitRate = 10, ConnectionString = queryString}
                 }
             };
-            var sqlSugarClient = new SqlSugarClient(connectionConfig);
-
             IoCContainer.Register(Configuration);//注册配置
-            IoCContainer.Register(sqlSugarClient);//注册数据库配置信息
-            IoCContainer.Register(typeof(DBContext));
-            IoCContainer.Register(typeof(DbSet<>).Assembly, "Repository");//注册仓储
+            IoCContainer.Register(connectionConfig);//注册数据库配置信息
+            IoCContainer.Register(typeof(DBService));
+            IoCContainer.Register(typeof(BaseRepository<>).Assembly, "Repository");//注册仓储
             IoCContainer.Register(typeof(BaseService).Assembly, "Service");
-            IoCContainer.Register(typeof(DbSet<>), typeof(IRepository<>));
+            IoCContainer.Register(typeof(BaseRepository<>), typeof(IRepository<>));
             return IoCContainer.Build(services);
         }
     }

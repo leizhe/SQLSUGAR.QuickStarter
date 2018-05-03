@@ -3,22 +3,25 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using SqlSugar;
 using SS.Domain.Repositories;
 
-namespace SS.Repositories.DBContext
+namespace SS.Repositories.SqlSugar
 {
-    public class DbSet<T> : SimpleClient<T>, IRepository<T> where T : class, new()
+    public class BaseRepository<T> : IRepository<T>  where T : class, new()
     {
-        public SqlSugarClient DB { get; }
-        public DbSet(SqlSugarClient context) : base(context)
-        {
-            DB = context;
-        }
         
+        public SqlSugarClient DB { get; set; }
+
+        public BaseRepository(DBService server)
+        {
+            DB = server.DB;
+        }
+
         public T FindSingle(Expression<Func<T, bool>> exp = null)
         {
-            return Context.Queryable<T>().First(exp);
+            return DB.Queryable<T>().First(exp);
         }
 
         public ISugarQueryable<T> Find(Expression<Func<T, bool>> exp = null)
@@ -35,7 +38,7 @@ namespace SS.Repositories.DBContext
             if (pageSize <= 0)
                 throw new ArgumentOutOfRangeException(nameof(pageSize), pageSize, "pageSize must great than or equal to 1.");
 
-            var query = Context.Queryable<T>().Where(expression);
+            var query = DB.Queryable<T>().Where(expression);
             var skip = (pageNumber - 1) * pageSize;
             var take = pageSize;
             if (sortPredicate == null)
@@ -64,48 +67,47 @@ namespace SS.Repositories.DBContext
 
         public long Add(T entity)
         {
-            return Context.Insertable(entity).ExecuteReturnBigIdentity();
+            return DB.Insertable(entity).ExecuteReturnBigIdentity();
         }
 
         public void AddRange(IEnumerable<T> entities)
         {
-            Context.Insertable(entities.ToArray()).ExecuteCommand();
+            DB.Insertable(entities.ToArray()).ExecuteCommand();
         }
 
-        public new void Update(T entity)
+        public void Update(T entity)
         {
-            Context.Updateable(entity).Where(true).ExecuteCommand();
+            DB.Updateable(entity).Where(true).ExecuteCommand();
         }
 
         public void Update(IEnumerable<T> entities)
         {
-            Context.Updateable(entities.ToArray()).Where(true).ExecuteCommand();
+            DB.Updateable(entities.ToArray()).Where(true).ExecuteCommand();
         }
         public void Update(Expression<Func<T, bool>> filterExpression, T entity)
         {
-            Context.Updateable(entity).Where(true).Where(filterExpression).ExecuteCommand();
+            DB.Updateable(entity).Where(true).Where(filterExpression).ExecuteCommand();
         }
 
-        public new void Delete(T entity)
+        public void Delete(T entity)
         {
-            Context.Deleteable(entity).ExecuteCommand();
+            DB.Deleteable(entity).ExecuteCommand();
         }
 
-        public new void Delete(Expression<Func<T, bool>> exp)
+        public void Delete(Expression<Func<T, bool>> exp)
         {
-            Context.Deleteable(exp).ExecuteCommand();
+            DB.Deleteable(exp).ExecuteCommand();
         }
 
         private ISugarQueryable<T> Filter(Expression<Func<T, bool>> exp)
         {
-            var dbSet = Context.Queryable<T>();
+            var dbSet = DB.Queryable<T>();
             if (exp != null)
                 dbSet = dbSet.Where(exp);
             return dbSet;
         }
-        
 
-       
-        
+
+      
     }
 }

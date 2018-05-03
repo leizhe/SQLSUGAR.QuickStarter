@@ -49,7 +49,7 @@ namespace SS.Application.ServiceImp
             // var q = _userRepository.GetAllQueryable();
             var filterExp = BuildExpression(input);
             var query = _userRepository.Find(filterExp, user => user.Id, SortOrder.Descending, input.Current, input.Size);
-            var dsad = _userRepository.GetAll().ToList();
+           // var dsad = _userRepository.GetAll().ToList();
             //var dsads = query.ToList();
             result.Total = _userRepository.Find(filterExp).Count();
             result.Data = query.Select(user => new UserDto()
@@ -61,13 +61,13 @@ namespace SS.Application.ServiceImp
                 Name = user.Name,
                 RealName = user.RealName,
                 Password = "*******",
-                Roles = user.UserRoles.Select(z => new BaseEntityDto()
-                {
-                    Id = z.Role.Id,
-                    Name = z.Role.RoleName
-                }).ToList(),
+                //Roles = user.UserRoles.Select(z => new BaseEntityDto()
+                //{
+                //    Id = z.Role.Id,
+                //    Name = z.Role.RoleName
+                //}).ToList(),
 
-                TotalRole = user.UserRoles.Count()
+                //TotalRole = user.UserRoles.Count()
             }).ToList();
 
             return result;
